@@ -2,7 +2,6 @@ import psycopg2
 import configparser
 import logging
 
-
 class PostgreAgent:
     """
     Pilotage d'une connexion a une db postgresql
@@ -67,10 +66,34 @@ class PostgreAgent:
         """
         self.cursor.execute(sql)
         table_list = [x[0] for x in self.cursor.fetchall()]
+        print(table_list)
         if table in table_list:
             val = True
         return val
 
+
+    def createTable_PJEcriture(self):
+        sql="""
+        CREATE TABLE PJ_Ecriture (
+            pj_id serial PRIMARY KEY,
+            Code_client VARCHAR (10) NOT NULL,
+            Cloture Date NOT NULL ,
+            NumeroCompte VARCHAR (10) NOT NULL,
+            CodeJournal VARCHAR (5) NOT NULL,
+            Folio SMALLINT ,
+            LigneFolio INT,
+            PeriodeEcriture DATE NOT NULL,
+            JourEcriture SMALLINT NOT NULL,
+            Libelle VARCHAR (255) NOT NULL,
+            Solde FLOAT,
+            NumeroPiece INT,
+            CodeLettrage VARCHAR (20),
+            CodeOperateur VARCHAR (20),
+            DateSysSaisie TIMESTAMP,
+            RefImage VARCHAR (255)
+        );
+        """
+        self.cursor.execute(sql)
 
 if __name__ == "__main__":
 
@@ -80,10 +103,19 @@ if __name__ == "__main__":
         level=logging.DEBUG,
         format="%(module)s %(funcName)s\t%(levelname)s - %(message)s",
     )
-    table = "paie_compteurs"
+    table = "pj_ecriture"
 
     conf = OrderedDict([('host', '10.0.0.17'), ('user', 'admin'), ('password', 'Zabayo@@'), ('port', '5432'), ('dbname', 'newton')])
     with PostgreAgent(conf) as db:
         if db.connection:
             if db.table_exists(table):
                 logging.debug(f"table {table} exists")
+        
+    
+    # with PostgreAgent(conf) as db:
+    #     try:
+    #         db.createTable_PJEcriture()
+    #         logging.debug("Table créée")
+    #     except Exception as e:
+    #         logging.debug(e)
+        

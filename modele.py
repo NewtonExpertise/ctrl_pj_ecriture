@@ -5,7 +5,7 @@ import os
 QPJE = Query_pj_ecriture()
 
 
-def get_pjinfos(path):
+def get_pjinfos_bdd_quadra(path):
     liste_pj_compta = QPJE.get_ref_img(os.path.join(path, 'qcompta.mdb'))
     pj_compta_info = {}
     if liste_pj_compta:

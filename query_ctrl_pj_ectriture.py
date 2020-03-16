@@ -58,20 +58,42 @@ class Query_pj_ecriture():
                                 Folio, LigneFolio, PeriodeEcriture, 
                                 JourEcriture, Libelle, Solde, NumeroPiece,
                                 CodeLettrage, CodeOperateur, DateSysSaisie, RefImage)
-        VALUES ({Code_client}, {Cloture}, {NumeroCompte}, {CodeJournal},
-                                {Folio}, {LigneFolio}, {PeriodeEcriture}, 
-                                {JourEcriture}, {Libelle}, {Solde}, {NumeroPiece},
-                                {CodeLettrage}, {CodeOperateur}, {DateSysSaisie},{RefImage})
+        VALUES ('{Code_client}', '{Cloture}', '{NumeroCompte}', '{CodeJournal}',
+                                '{Folio}', '{LigneFolio}', '{PeriodeEcriture}', 
+                                {JourEcriture}, '{Libelle}', '{Solde}', '{NumeroPiece}',
+                                '{CodeLettrage}', '{CodeOperateur}', '{DateSysSaisie}','{RefImage}')        
         """
+        print(sql)
         with PostgreAgent(self.conf_postgre) as db:
-            pass
+            data = db.execute(sql)
+
+
     
 
-    def check_pj_exist(self, RefImage):
+    def get_infos_pj(self, RefImage):
         sql = f"""
         SELECT Code_client, Cloture, NumeroCompte, Libelle, Solde, CodeOperateur, DateSysSaisie, RefImage
         FROM pj_ecriture
-        WHERE RefImage = {RefImage}
+        WHERE RefImage = '{RefImage}'
         """
         with PostgreAgent(self.conf_postgre) as db:
-            pass
+            data = db.query(sql)
+        return data
+
+    def select_all(self):
+        sql = """
+        SELECT *
+        FROM "pj_ecriture"
+        """
+        print(sql)
+        print(self.conf_postgre)
+        with PostgreAgent(self.conf_postgre) as db:
+            if db.connection:
+                data = db.query(sql)
+        return data
+
+if __name__ == "__main__":
+    mdb= r'\\SRVQUADRA\QAPPLI\QUADRA\DATABASE\CPTA\DC\000004\Qcompta.mdb'
+    x = Query_pj_ecriture()
+    # print(x.get_periode_exercice(mdb))
+    print(x.select_all())

@@ -40,7 +40,15 @@ class PostgreAgent:
     def __exit__(self, exc_type, exc_value, traceback):
         self._close()
 
+    def execute(self, sql):
+        try:
+            self.cursor.execute(sql)
+        except (Exception, psycopg2.Error) as error:
+            logging.error(f"Echec requête : {error}")
+        
+    
     def query(self, sql):
+
         data = []
         try:
             self.cursor.execute(sql)
@@ -62,11 +70,11 @@ class PostgreAgent:
     def table_exists(self, table):
         val = False
         sql = """
-        SELECT table_name FROM information_schema.tables where table_schema='public' ;
+        SELECT table_name FROM information_schema.tables;
         """
         self.cursor.execute(sql)
         table_list = [x[0] for x in self.cursor.fetchall()]
-        print(table_list)
+        print(sorted(table_list))
         if table in table_list:
             val = True
         return val
@@ -86,7 +94,7 @@ class PostgreAgent:
             JourEcriture SMALLINT NOT NULL,
             Libelle VARCHAR (255) NOT NULL,
             Solde FLOAT,
-            NumeroPiece INT,
+            NumeroPiece VARCHAR (20),
             CodeLettrage VARCHAR (20),
             CodeOperateur VARCHAR (20),
             DateSysSaisie TIMESTAMP,
@@ -94,6 +102,9 @@ class PostgreAgent:
         );
         """
         self.cursor.execute(sql)
+
+
+
 
 if __name__ == "__main__":
 
@@ -105,11 +116,12 @@ if __name__ == "__main__":
     )
     table = "pj_ecriture"
 
-    conf = OrderedDict([('host', '10.0.0.17'), ('user', 'admin'), ('password', 'Zabayo@@'), ('port', '5432'), ('dbname', 'newton')])
+    conf = OrderedDict([('host', '10.0.0.17'), ('user', 'admin'), ('password', 'Zabayo@@'), ('port', '5432'), ('dbname', 'outils')])
     with PostgreAgent(conf) as db:
-        if db.connection:
-            if db.table_exists(table):
-                logging.debug(f"table {table} exists")
+        print(db.table_exists('pj_ecriture'))
+
+        # db.select_all()
+
         
     
     # with PostgreAgent(conf) as db:

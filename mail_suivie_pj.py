@@ -13,8 +13,10 @@ class relance_mail():
 
         self.mail = ''
         self.msg = MIMEMultipart()
-        self.host = 'smtp.serinyatelecom.fr'
-        self.port = 25
+        # self.host = 'smtp.serinyatelecom.fr'
+        # self.port = 25
+        self.smtp = smtplib.SMTP_SSL('smtp.yaziba.net:465')
+        self.smtp.login("mathieu.leroy@newtonexpertise.com", "KetBoshGha%7")
 
 
     def corps_tableau(self, Dossier, refimg, NumeroCompte, Periode_ecriture, Ligne_folio, Libelle, Solde, NumeroPiece, CodeOperateur, DateSysSaisie):
@@ -55,7 +57,7 @@ class relance_mail():
     def corps_mail(self, corps_tableau):
         
         self.msg['Subject'] = "Reporting pièces jointes "
-
+        
         message = f"""<html>
         <body>
             <p style="width: 50px; font-family:Calibri;">
@@ -134,22 +136,19 @@ class relance_mail():
 
 
         print(list_destinataire)
-        mailserver = smtplib.SMTP(self.host , self.port)
+        # mailserver = smtplib.SMTP(self.host , self.port)
 
         try:
-            x=mailserver.sendmail('mathieu.leroy@newtonexpertise.com', list_destinataire, self.msg.as_string())
+            x=self.smtp.sendmail("mathieu.leroy@newtonexpertise.com", list_destinataire, self.msg.as_string())
+            # x=mailserver.sendmail(expediteur, list_destinataire, self.msg.as_string())
 
             print(x)
         except smtplib.SMTPException as e:
             print(e)
+        self.smtp.quit()
+        # mailserver.quit()
 
-        mailserver.quit()
 
-# nicolas.rollet@newtonexpertise.com
-# mathieu.leroy@newtonexpertise.com
-# jasmine.lefebvre@newtonexpertise.com
-
-    # def set_mail_relance(self):
 
 if __name__ == '__main__':
     x= relance_mail()
@@ -157,7 +156,6 @@ if __name__ == '__main__':
     a=""
     while i < 10:
         i+=1
-        a += x.corps_tableau("Dossier", "refimg", "Periode_ecriture", "Ligne_folio", "Libelle", "Solde", "NumeroPiece", "CodeOperateur", "DateSysSaisie")
-
-    x.corps_mail("mathieu.leroy@newtonexpertise.com",a)
-    x.send_mail()
+        a += x.corps_tableau("Dossier", "refimg", "NumeroCompte", "Periode_ecriture", "Ligne_folio", "Libelle", "Solde", "NumeroPiece", "CodeOperateur", "DateSysSaisie")
+    x.corps_mail(a)
+    x.send_mail("mathieu.leroy@newtonexpertise.com")

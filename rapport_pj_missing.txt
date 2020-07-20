@@ -1,0 +1,1 @@
+Dossier;Ref image;Compte;Periode ecriture;Ligne folio;Libelle;Solde;Num Piece;Operateur;DateSysSaisie

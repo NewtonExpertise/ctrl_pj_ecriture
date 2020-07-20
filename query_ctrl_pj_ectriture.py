@@ -60,10 +60,10 @@ class Query_pj_ecriture():
                                 CodeLettrage, CodeOperateur, DateSysSaisie, RefImage)
         VALUES ('{Code_client}', '{Cloture}', '{NumeroCompte}', '{CodeJournal}',
                                 '{Folio}', '{LigneFolio}', '{PeriodeEcriture}', 
-                                {JourEcriture}, '{Libelle}', '{Solde}', '{NumeroPiece}',
-                                '{CodeLettrage}', '{CodeOperateur}', '{DateSysSaisie}','{RefImage}')        
+                                {JourEcriture}, '{Libelle.replace("'"," ")}', '{Solde}', '{NumeroPiece.replace("'"," ")}',
+                                '{CodeLettrage}', '{CodeOperateur}', '{DateSysSaisie}','{RefImage.replace("'"," ")}')        
         """
-        print(sql)
+        
         with PostgreAgent(self.conf_postgre) as db:
             data = db.execute(sql)
 

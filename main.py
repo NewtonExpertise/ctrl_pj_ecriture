@@ -17,9 +17,11 @@ QPJE = Query_pj_ecriture()
 
 reporting_error = {}
 
+
 #on récupère le chemin de chaque dossier
 liste_path_all_DC = Q.chemins_cpta(categ="DC")
 i=0
+rapport_txt = False
 
 for path in  liste_path_all_DC:
     i+=1
@@ -30,6 +32,7 @@ for path in  liste_path_all_DC:
     except Exception as e:
         print('ERRRREUUURRRRR')
         print(e)
+        print(path)
     if pj_infos_quadra:
         if os.path.isdir(os.path.join(path, "Images")) :
             contenu_fichier_img = os.listdir(os.path.join(path, "Images"))
@@ -42,7 +45,7 @@ for path in  liste_path_all_DC:
                 if infos_missing_pj_pg:
                     continue
                 else:
-                    
+                    # insertion PG
                     periode_ex = QPJE.get_periode_exercice(os.path.join(path, 'qcompta.mdb'))
                     infos_pj['cloture'] = periode_ex['fin']
                     reporting_error[ref_img] = infos_pj
@@ -52,24 +55,30 @@ for path in  liste_path_all_DC:
                                                     infos_pj['Solde'], infos_pj['NumeroPiece'], infos_pj['CodeLettrage'], infos_pj['CodeOperateur'],
                                                     infos_pj['DateSysSaisie'].strftime("%d/%m/%Y"), ref_img)
 
-                    mail = relance_mail()
-                    corps_tableau = ""
-                    rapport_txt = 'Dossier;Ref image;Compte;Periode ecriture;Ligne folio;Libelle;Solde;Num Piece;Operateur;DateSysSaisie\n'
+mail = relance_mail()
+corps_tableau = ""
 
-                    for ref_img, infos_pj in reporting_error.items():
+rapport_txt = 'Dossier;Ref image;Compte;Periode ecriture;Ligne folio;Libelle;Solde;Num Piece;Operateur;DateSysSaisie\n'
+if reporting_error:
+    for ref_img, infos_pj in reporting_error.items():
 
-                        corps_tableau += mail.corps_tableau(infos_pj['code_client'] ,ref_img, infos_pj['NumeroCompte'], infos_pj['PeriodeEcriture'], 
-                                                            infos_pj['LigneFolio'], infos_pj['Libelle'], infos_pj['Solde'], 
-                                                            infos_pj['NumeroPiece'], infos_pj['CodeOperateur'], infos_pj['DateSysSaisie'])
-                    
-                        rapport_txt += f"{infos_pj['code_client']};{ref_img};{infos_pj['NumeroCompte']} \
-                        ;{infos_pj['PeriodeEcriture']};{infos_pj['LigneFolio']};{infos_pj['Libelle']} \
-                        ;{infos_pj['Solde']};{infos_pj['NumeroPiece']};{infos_pj['CodeOperateur']};{infos_pj['DateSysSaisie']}\n"
-
-with open('rapport_pj_missing.txt', "w") as rapport:
-    rapport.write(rapport_txt)
+        corps_tableau += mail.corps_tableau(infos_pj['code_client'] ,ref_img, infos_pj['NumeroCompte'], infos_pj['PeriodeEcriture'], 
+                                            infos_pj['LigneFolio'], infos_pj['Libelle'], infos_pj['Solde'], 
+                                            infos_pj['NumeroPiece'], infos_pj['CodeOperateur'], infos_pj['DateSysSaisie'])
+    
+        rapport_txt += f"{infos_pj['code_client']};{ref_img};{infos_pj['NumeroCompte']} \
+        ;{infos_pj['PeriodeEcriture']};{infos_pj['LigneFolio']};{infos_pj['Libelle']} \
+        ;{infos_pj['Solde']};{infos_pj['NumeroPiece']};{infos_pj['CodeOperateur']};{infos_pj['DateSysSaisie']}\n"
+                        
+if rapport_txt:
+    with open('rapport_pj_missing.txt', "w") as rapport:
+        rapport.write(rapport_txt)
+else:
+    with open('rapport_pj_missing.txt', "w") as rapport:
+        rapport.write("Pas de PJ manquante")
 
 mail.piece_jointe('rapport_pj_missing.txt')
+print(corps_tableau)
 mail.corps_mail(corps_tableau)
-mail.send_mail(['mathieu.leroy@newtonexpertise.com', 'nicolas.rollet@newtonexpertise.com'])
+mail.send_mail(['mathieu.leroy@newtonexpertise.com', 'mathieu.leroy@newtonexpertise.com'])
 
